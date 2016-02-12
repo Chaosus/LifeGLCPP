@@ -1,0 +1,7 @@
+VSync:0
+Width:80
+Height:60
+TSize:10
+Wrap:1
+Speed:0.01
+FForce:0.1

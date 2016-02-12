@@ -1,0 +1,6 @@
+Width:60
+Height:60
+TSize:10
+Wrap:1
+Speed:0.028
+FForce:0.1
