@@ -23,7 +23,7 @@
 #define WINDOWS 0
 #define LINUX 1
 
-#ifdef _WINDOWS // VisualC++ special define
+#ifdef _WIN32
 #define PLATFORM WINDOWS
 #else
 #define PLATFORM LINUX
