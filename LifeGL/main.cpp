@@ -79,11 +79,13 @@ const bool bDefVSync{ false };
 const int iDefSizeX{ 60 };
 const int iDefSizeY{ 60 };
 const int iDefTileSize{ 10 };
-const float iDefSpeed{ 0.03f };
+const float dDefDelay{ 0.03f };
 const double dDefFadeForce{ 0.1 };
-const std::string strMainTitle{ "LifeGL v1.05" };
+const std::string strMainTitle{ "LifeGL v1.06" };
 const std::string strParamFileName{ "params.txt" };
 const bool bUseSeparateThread{ true }; // If disabled the speed of simulation will be limited to vsync and processing speed of main loop
+const double dMinDelay{ 0.0 };
+const double dMaxDelay{ 0.1 };
 
 bool bVSync = bDefVSync; // Vertical synchronization
 bool bFadeEffect{ true };
@@ -99,7 +101,7 @@ int iSizeY = iDefSizeY;
 int iTileSize = iDefTileSize;
 double dFadeForce = dDefFadeForce;
 bool bWrap{ true };
-double dSpeed = iDefSpeed;
+double dSpeed = dDefDelay;
 bool bShowInfo{ true };
 int iSavedSizeX;
 int iSavedSizeY;
@@ -113,6 +115,7 @@ bool bShutdown{ false };
 bool bRequestThreadStop;
 bool bThreadStopped{ true };
 std::unique_ptr<Tile[]> pField{ nullptr };
+float fColorR = 0.0f, fColorG = 1.0f, fColorB = 0.0f;
 
 inline auto GetOffset(int x, int y) -> int
 {
@@ -381,6 +384,8 @@ void Exit()
 
 auto ProcessEvent(SDL_Window* window,const SDL_Event& e) -> void
 {
+	static bool lshift_pressed = false;
+
 	switch (e.type)
 	{
 	case SDL_QUIT:
@@ -416,7 +421,7 @@ auto ProcessEvent(SDL_Window* window,const SDL_Event& e) -> void
 
 			// SET SPEED TO DEFAULT VALUE
 			
-			dSpeed = iDefSpeed;
+			dSpeed = dDefDelay;
 			UpdateDelaySS();
 			break;
 		case SDLK_x:
@@ -438,6 +443,14 @@ auto ProcessEvent(SDL_Window* window,const SDL_Event& e) -> void
 			Reset();
 			break;
 		case SDLK_LSHIFT:
+			if (!bStart)
+			{
+				if (!lshift_pressed) {
+					Tick();
+					lshift_pressed = true;
+				}
+			}
+			break;
 		case SDLK_SPACE:
 			bStart = !bStart;
 			break;
@@ -455,6 +468,15 @@ auto ProcessEvent(SDL_Window* window,const SDL_Event& e) -> void
 		}
 
 		break; 
+
+	case SDL_KEYUP:
+		switch (e.key.keysym.sym)
+		{
+		case SDLK_LSHIFT:
+			lshift_pressed = false;
+			break;
+		}
+		break;
 
 	case SDL_MOUSEBUTTONDOWN:
 
@@ -503,7 +525,7 @@ auto ProcessEvent(SDL_Window* window,const SDL_Event& e) -> void
 		if (wheelChanged)
 		{
 			dSpeed += fDeltaY;
-			dSpeed = ClampD(dSpeed, 0, 0.1);
+			dSpeed = ClampD(dSpeed, dMinDelay, dMaxDelay);
 			UpdateDelaySS();
 		}
 
@@ -621,20 +643,20 @@ auto DrawTile(int x, int y) -> void
 {
 	auto offset = GetOffset(x, y);
 
-
 	if (bFadeEffect)
-	{		 
-		glColor3f(pField[offset].fade, 0, 0); 
+	{
+		float f = pField[offset].fade;
+		glColor3f(fColorR * f , fColorG * f, fColorB * f); 
 	}
 	else
 	{
 		if (pField[offset].state > 0)
-			glColor3f(1, 0, 0);
+			glColor3f(fColorR, fColorG, fColorB);
 		else
 			return;
 	} 
 
-	Rect rect = pField[offset].rect;
+	auto rect = pField[offset].rect;
 	glRecti(rect.left, rect.top, rect.right, rect.bottom);
 }
 
@@ -783,7 +805,7 @@ auto SaveParams() -> void
 		fstream file;
 		file.open("params.txt", ios_base::out | ios_base::trunc);
 
-		file << "VSync" << bVSync << "Width:" << iSizeX << "\nHeight:" << iSizeY << "\nTSize:" << iTileSize << "\nWrap:" << bWrap << "\nSpeed:" << dSpeed << "\nFForce:" << dFadeForce << "\n";
+		file << "VerticalSync:" << bVSync << "\nWidth:" << iSizeX << "\nHeight:" << iSizeY << "\nTileSize:" << iTileSize << "\nWrap:" << bWrap << "\nDelay:" << dSpeed << "\nFadeForce:" << dFadeForce << "\n";
 
 		file.close();
 	}
@@ -834,7 +856,7 @@ auto LoadParams() -> void
 		iSavedSizeY = iSizeY = ExtractDec(height);
 		iSavedTileSize = iTileSize = ExtractDec(tsize);
 		bSavedWrap = bWrap = ExtractDec(wrap)==0?false:true;
-		dSavedSpeed = dSpeed = ExtractDouble(speed);
+		dSavedSpeed = dSpeed = ClampD(ExtractDouble(speed), dMinDelay, dMaxDelay);
 		dFadeForce = ExtractDouble(fforce);
 
 		file.close();

@@ -1,0 +1,28 @@
+-------------------------------
+Mouse binding
+-------------------------------
+Left click = setup life point
+Right click - remove life point
+Scroll whell up/down - increase/decrease simulation speed
+-------------------------------
+Keyboard binding
+-------------------------------
+Space - run/stop simulation
+LeftShift - one step of simulation(works only when simulation is stopped)
+R - clear simulation
+(+/-)(X/Z) - increase/decrease simulation speed
+S - set default simulation speed (0.03)
+G - enable/disable grid
+W - enable/disable wrapping edges
+D - enable/disable showing info in title
+Escape - exit
+-------------------------------
+Options(params.txt)
+-------------------------------
+VSync -(0|1) - enable/disable vertical syncronization
+Width - width of simulation
+Height - height of simulation
+TSize - size of life cell(10 recommended)
+Wrap - (0/1) - enable/disable wrapping edges
+Delay - delay between simulation ticks(default - 0.03,min - 0,max - 0.1)
+FForce - fade force - default(0.1)
