@@ -19,10 +19,10 @@ Escape - exit
 -------------------------------
 Options(params.txt)
 -------------------------------
-VSync -(0|1) - enable/disable vertical syncronization
+VerticalSync -(0|1) - enable/disable vertical syncronization
 Width - width of simulation
 Height - height of simulation
-TSize - size of life cell(10 recommended)
+TileSize - size of life cell(10 recommended)
 Wrap - (0/1) - enable/disable wrapping edges
 Delay - delay between simulation ticks(default - 0.03,min - 0,max - 0.1)
-FForce - fade force - default(0.1)
+FadeForce - fade force - default(0.1)
