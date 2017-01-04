@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="params.txt" />
+    <Text Include="controls.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

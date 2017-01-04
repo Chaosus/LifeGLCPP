@@ -81,7 +81,7 @@ const int iDefSizeY{ 60 };
 const int iDefTileSize{ 10 };
 const float dDefDelay{ 0.03f };
 const double dDefFadeForce{ 0.1 };
-const std::string strMainTitle{ "LifeGL v1.06" };
+const std::string strMainTitle{ "LifeGL v1.6.1" };
 const std::string strParamFileName{ "params.txt" };
 const bool bUseSeparateThread{ true }; // If disabled the speed of simulation will be limited to vsync and processing speed of main loop
 const double dMinDelay{ 0.0 };
@@ -113,7 +113,7 @@ int iResY;
 bool bStart;
 bool bShutdown{ false };
 bool bRequestThreadStop;
-bool bThreadStopped{ true };
+volatile bool bThreadStopped{ true };
 std::unique_ptr<Tile[]> pField{ nullptr };
 float fColorR = 0.0f, fColorG = 1.0f, fColorB = 0.0f;
 
@@ -327,10 +327,12 @@ MAIN
 		
 		EndFPS();
 	}
-	
+
+	bRequestThreadStop = true;
+
 	// wait until separate thread is stopped
 
-	if (bUseSeparateThread)
+	if (bUseSeparateThread && bStart)
 	{
 		while (!bThreadStopped) {}
 	}
@@ -645,7 +647,7 @@ auto DrawTile(int x, int y) -> void
 
 	if (bFadeEffect)
 	{
-		float f = pField[offset].fade;
+		double f = pField[offset].fade;
 		glColor3f(fColorR * f , fColorG * f, fColorB * f); 
 	}
 	else
