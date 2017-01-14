@@ -1,0 +1,2 @@
+VerticalSync:0
+Delay:0.024

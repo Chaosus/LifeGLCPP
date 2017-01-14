@@ -1,7 +1,5 @@
-VerticalSync:0
 Width:60
 Height:60
 TileSize:10
-Wrap:1
-Delay:0.03
+Wrap:0
 FadeForce:0.1
